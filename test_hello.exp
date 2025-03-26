@@ -1,6 +1,5 @@
 #!/usr/bin/expect -f
 
-set timeout 10
 
 # Try to kill any running QEMU processes, ignore errors
 catch { exec pkill -f qemu-system-riscv64 } result
@@ -9,6 +8,7 @@ catch { exec pkill -f qemu-system-riscv64 } result
 spawn make qemu
 
 # Wait for shell prompt
+set timeout 10
 expect {
     "init: starting sh" {}
     timeout {
@@ -17,6 +17,8 @@ expect {
     }
 }
 
+set timeout 2
+
 # Run the hello user program
 send "hello\r"
 
@@ -24,7 +26,7 @@ send "hello\r"
 expect {
     "Hello from xv6 kernel!" {}
     timeout {
-        puts "❌ Missing: Hello from xv6 kernel!"
+        puts "FAILED: Missing Hello from xv6 kernel!"
         exit 1
     }
 }
@@ -32,7 +34,7 @@ expect {
 expect {
     "sys_hello() returned 46201" {}
     timeout {
-        puts "❌ Missing: sys_hello() returned 46201"
+        puts "FAILED: Missing sys_hello() returned 46201"
         exit 1
     }
 }
@@ -44,4 +46,4 @@ send "\001x"
 # Wait for QEMU to shut down
 expect eof
 puts ""
-puts "✅ PASS"
+puts "SUCCESS: All tests passed!"
